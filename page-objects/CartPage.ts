@@ -4,54 +4,48 @@ export class CartPage {
   readonly page: Page;
   readonly cartItems: Locator;
   readonly checkoutButton: Locator;
-  readonly emptyCartMessage: Locator;
+  readonly continueShoppingButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.cartItems = page.locator('.cart-item').or(page.locator('mat-card').filter({ has: page.locator('.delete') }));
-    this.checkoutButton = page.getByRole('button', { name: /checkout/i });
-    this.emptyCartMessage = page.getByText(/your shopping cart is empty/i);
+    this.cartItems = page.locator('.cart_item');
+    this.checkoutButton = page.locator('[data-test="checkout"]');
+    this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
   }
 
   async goto() {
-    await this.page.goto('/shopping-cart');
+    await this.page.goto('/cart.html');
   }
 
   async getItemCount(): Promise<number> {
     return this.cartItems.count();
   }
 
-  async increaseQuantity(itemIndex = 0) {
-    const increaseBtn = this.cartItems.nth(itemIndex)
-      .getByRole('button', { name: /\+/ })
-      .or(this.page.locator('button').filter({ hasText: '+' }).nth(itemIndex));
-    await increaseBtn.click();
+  async removeItemByName(name: string) {
+    const item = this.cartItems.filter({ hasText: name });
+    const dataTestAttr = name.toLowerCase().replace(/\s+/g, '-');
+    await item.locator(`[data-test="remove-${dataTestAttr}"]`).click();
   }
 
-  async decreaseQuantity(itemIndex = 0) {
-    const decreaseBtn = this.cartItems.nth(itemIndex)
-      .getByRole('button', { name: /-/ })
-      .or(this.page.locator('button').filter({ hasText: '-' }).nth(itemIndex));
-    await decreaseBtn.click();
-  }
-
-  async removeItem(itemIndex = 0) {
-    const deleteBtn = this.cartItems.nth(itemIndex)
-      .getByRole('button', { name: /delete/i })
-      .or(this.page.locator('button mat-icon').filter({ hasText: 'delete' }).nth(itemIndex));
-    await deleteBtn.click();
+  async removeFirstItem() {
+    const removeButton = this.cartItems.first().locator('[data-test^="remove"]');
+    await removeButton.click();
   }
 
   async proceedToCheckout() {
     await this.checkoutButton.click();
-    await expect(this.page).toHaveURL(/checkout/);
+    await expect(this.page).toHaveURL(/checkout-step-one/);
   }
 
   async expectCartEmpty() {
-    await expect(this.emptyCartMessage).toBeVisible();
+    await expect(this.cartItems).toHaveCount(0);
   }
 
   async expectCartNotEmpty() {
-    await expect(this.checkoutButton).toBeVisible();
+    await expect(this.cartItems.first()).toBeVisible();
+  }
+
+  getItemName(index = 0): Locator {
+    return this.cartItems.nth(index).locator('.inventory_item_name');
   }
 }

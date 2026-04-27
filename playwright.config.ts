@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   /* Shared settings for all the projects below */
   use: {
-    baseURL: 'https://bookcart.azurewebsites.net',
+    baseURL: 'https://www.saucedemo.com',
     /* Collect trace on first retry */
     trace: 'on-first-retry',
     /* Capture screenshot on failure */

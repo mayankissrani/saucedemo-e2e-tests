@@ -9,14 +9,14 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.usernameInput = page.getByPlaceholder('Username');
-    this.passwordInput = page.getByPlaceholder('Password');
-    this.loginButton = page.getByRole('button', { name: /login/i });
-    this.errorMessage = page.getByText(/invalid username or password/i);
+    this.usernameInput = page.locator('[data-test="username"]');
+    this.passwordInput = page.locator('[data-test="password"]');
+    this.loginButton = page.locator('[data-test="login-button"]');
+    this.errorMessage = page.locator('[data-test="error"]');
   }
 
   async goto() {
-    await this.page.goto('/login');
+    await this.page.goto('/');
   }
 
   async login(username: string, password: string) {
@@ -26,7 +26,7 @@ export class LoginPage {
   }
 
   async expectLoginSuccess() {
-    await expect(this.page).toHaveURL('/');
+    await expect(this.page).toHaveURL(/inventory/);
   }
 
   async expectLoginError() {

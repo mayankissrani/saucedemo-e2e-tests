@@ -2,56 +2,60 @@ import { type Page, type Locator, expect } from '@playwright/test';
 
 export class CheckoutPage {
   readonly page: Page;
-  readonly addressInput: Locator;
-  readonly cityInput: Locator;
-  readonly stateInput: Locator;
+  readonly firstNameInput: Locator;
+  readonly lastNameInput: Locator;
   readonly postalCodeInput: Locator;
-  readonly countryInput: Locator;
-  readonly placeOrderButton: Locator;
-  readonly orderConfirmationMessage: Locator;
-  readonly orderSummary: Locator;
+  readonly continueButton: Locator;
+  readonly finishButton: Locator;
+  readonly cancelButton: Locator;
+  readonly confirmationHeader: Locator;
+  readonly summaryTotal: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.addressInput = page.getByLabel(/address/i).or(page.getByPlaceholder(/address/i));
-    this.cityInput = page.getByLabel(/city/i).or(page.getByPlaceholder(/city/i));
-    this.stateInput = page.getByLabel(/state/i).or(page.getByPlaceholder(/state/i));
-    this.postalCodeInput = page.getByLabel(/postal|zip/i).or(page.getByPlaceholder(/postal|zip/i));
-    this.countryInput = page.getByLabel(/country/i).or(page.getByPlaceholder(/country/i));
-    this.placeOrderButton = page.getByRole('button', { name: /place order/i });
-    this.orderConfirmationMessage = page.getByText(/order placed/i)
-      .or(page.getByText(/successfully/i))
-      .or(page.getByText(/thank you/i));
-    this.orderSummary = page.locator('.order-summary').or(page.locator('mat-card').filter({ hasText: /order/i }));
+    this.firstNameInput = page.locator('[data-test="firstName"]');
+    this.lastNameInput = page.locator('[data-test="lastName"]');
+    this.postalCodeInput = page.locator('[data-test="postalCode"]');
+    this.continueButton = page.locator('[data-test="continue"]');
+    this.finishButton = page.locator('[data-test="finish"]');
+    this.cancelButton = page.locator('[data-test="cancel"]');
+    this.confirmationHeader = page.locator('.complete-header');
+    this.summaryTotal = page.locator('.summary_total_label');
   }
 
-  async goto() {
-    await this.page.goto('/checkout');
+  async gotoStepOne() {
+    await this.page.goto('/checkout-step-one.html');
   }
 
-  async fillShippingDetails(details: {
-    address: string;
-    city: string;
-    state: string;
+  async fillContactInfo(details: {
+    firstName: string;
+    lastName: string;
     postalCode: string;
-    country: string;
   }) {
-    await this.addressInput.fill(details.address);
-    await this.cityInput.fill(details.city);
-    await this.stateInput.fill(details.state);
+    await this.firstNameInput.fill(details.firstName);
+    await this.lastNameInput.fill(details.lastName);
     await this.postalCodeInput.fill(details.postalCode);
-    await this.countryInput.fill(details.country);
   }
 
-  async placeOrder() {
-    await this.placeOrderButton.click();
+  async continueToStepTwo() {
+    await this.continueButton.click();
+    await expect(this.page).toHaveURL(/checkout-step-two/);
+  }
+
+  async finish() {
+    await this.finishButton.click();
+    await expect(this.page).toHaveURL(/checkout-complete/);
   }
 
   async expectOrderConfirmation() {
-    await expect(this.orderConfirmationMessage).toBeVisible();
+    await expect(this.confirmationHeader).toHaveText('Thank you for your order!');
   }
 
-  async expectOnCheckoutPage() {
-    await expect(this.page).toHaveURL(/checkout/);
+  async expectOnStepOne() {
+    await expect(this.page).toHaveURL(/checkout-step-one/);
+  }
+
+  async expectOnStepTwo() {
+    await expect(this.page).toHaveURL(/checkout-step-two/);
   }
 }

@@ -1,14 +1,14 @@
 {
-  "name": "bookcart-e2e-tests",
+  "name": "saucedemo-e2e-tests",
   "version": "1.0.0",
-  "description": "End-to-end tests for the BookCart application using Playwright",
+  "description": "Professional end-to-end test suite for SauceDemo (Swag Labs) using Playwright and TypeScript",
   "scripts": {
     "test": "playwright test",
+    "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:chromium": "playwright test --project=chromium",
     "test:firefox": "playwright test --project=firefox",
     "test:webkit": "playwright test --project=webkit",
-    "test:api": "playwright test tests/api.spec.ts",
     "report": "playwright show-report"
   },
   "devDependencies": {
